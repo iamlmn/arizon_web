@@ -34,7 +34,64 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
-</head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script>
+	function lockEnquiryFormFields() {
+  $('#enquiry-form-status').html('');
+  $('#enquiry-form input').attr('disabled', true);
+  $('#enquiry-form textarea').attr('disabled', true);
+  $('#enquiry-submit').val('Submitting...');
+}
+
+
+function resetEnquiryFormFields() {
+  $('#enquiry-form input').val('');
+  $('#enquiry-submit').val('Submit Query');
+  $('#enquiry-form textarea').val('');
+  unlockEnquiryFormFields();
+}
+
+function unlockEnquiryFormFields() {
+  $('#enquiry-submit').val('Submit Query');
+  $('#enquiry-form input').attr('disabled', false);
+  $('#enquiry-form textarea').attr('disabled', false);
+}
+
+const enquiryFormSubmitUrl = 'https://gmz7hhman7.execute-api.us-east-1.amazonaws.com/dev/contact-us?Client=arizonarchitects';
+$(document).ready(function () {
+  $('#enquiry-form').submit(function (e) {
+      e.preventDefault();
+      lockEnquiryFormFields();
+      var enquiryData = {
+          name: $('#enquiry-name').val(),
+          email: $('#enquiry-email').val(),
+          phone: $('#enquiry-phone').val(),
+          message: $('#enquiry-message').val(),
+      };
+      $.ajax({
+          type: "POST",
+          url: enquiryFormSubmitUrl,
+          crossDomain: "true",
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+          data: JSON.stringify(enquiryData),
+          success: function (result) {
+              resetEnquiryFormFields();
+              $('#enquiry-form-status').html(`
+        <span class="text-success">Query successfully submitted!</span>
+      `);
+          }
+      }).fail(function (error) {
+          unlockEnquiryFormFields();
+          $('#enquiry-form-status').html(`
+      <span class="text-danger">Couldn't submit your query. Please try again...</span>
+    `);
+      });
+  });
+});
+	
+	</script>
+	</head>
 
 <body>
 
@@ -112,7 +169,7 @@
               <div class="phone">
                 <i class="bi bi-phone"></i>
                 <h4>Call:</h4>
-                <p>+91 9962608221 or +91 8056158091</p>
+                <p>+91-9962608221 or +91-8056158091</p>
               </div>
 
             </div>
@@ -121,27 +178,27 @@
 
           <div class="col-lg-8 mt-5 mt-lg-0">
 
-            <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+            <form method="post" action="" id="enquiry-form" role="form" class="php-email-form">
               <div class="row">
                 <div class="col-md-6 form-group">
-                  <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>
+                  <input type="text" name="name" class="form-control" id="enquiry-name" placeholder="Your Name" required>
                 </div>
                 <div class="col-md-6 form-group mt-3 mt-md-0">
-                  <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" required>
+                  <input type="email" class="form-control" name="email" id="enquiry-email" placeholder="Your Email" required>
                 </div>
               </div>
               <div class="form-group mt-3">
-                <input type="text" class="form-control" name="Project type and location" id="Project type and location" placeholder="Project type and location" required>
+                <input type="text" class="form-control" name="Project type and location" id="enquiry-type" placeholder="Project type and location" required>
               </div>
               <div class="form-group mt-3">
-                <textarea class="form-control" name="Please send project Typology,Location area and scope of work for quotation" rows="5" placeholder="Please send project Typology,Location area and scope of work for quotation" required></textarea>
+                <textarea class="form-control" id="enquiry-message" name="Please send project Typology,Location area and scope of work for quotation" rows="5" placeholder="Please send project Typology,Location area and scope of work for quotation" required></textarea>
               </div>
-              <div class="my-3">
+              <!-- <div class="my-3">
                 <div class="loading">Loading</div>
                 <div class="error-message"></div>
                 <div class="sent-message">Your message has been sent. Thank you!</div>
-              </div>
-              <div class="text-center"><button type="submit">Send Message</button></div>
+              </div> -->
+              <div class="text-center"><button id="enquiry-submit" type="submit">Send Message</button></div>
             </form>
 
           </div>

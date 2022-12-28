@@ -1,0 +1,83 @@
+<!Doctype html>
+<html>
+
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script>
+	function lockEnquiryFormFields() {
+  $('#enquiry-form-status').html('');
+  $('#enquiry-form input').attr('disabled', true);
+  $('#enquiry-form textarea').attr('disabled', true);
+  $('#enquiry-submit').val('Submitting...');
+}
+
+
+function resetEnquiryFormFields() {
+  $('#enquiry-form input').val('');
+  $('#enquiry-submit').val('Submit Query');
+  $('#enquiry-form textarea').val('');
+  unlockEnquiryFormFields();
+}
+
+function unlockEnquiryFormFields() {
+  $('#enquiry-submit').val('Submit Query');
+  $('#enquiry-form input').attr('disabled', false);
+  $('#enquiry-form textarea').attr('disabled', false);
+}
+
+const enquiryFormSubmitUrl = 'https://gmz7hhman7.execute-api.us-east-1.amazonaws.com/dev/contact-us?Client=arizonarchitects';
+$(document).ready(function () {
+  $('#enquiry-form').submit(function (e) {
+      e.preventDefault();
+      lockEnquiryFormFields();
+      var enquiryData = {
+          name: $('#enquiry-name').val(),
+          email: $('#enquiry-email').val(),
+          phone: $('#enquiry-phone').val(),
+          message: $('#enquiry-message').val(),
+      };
+      $.ajax({
+          type: "POST",
+          url: enquiryFormSubmitUrl,
+          crossDomain: "true",
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+          data: JSON.stringify(enquiryData),
+          success: function (result) {
+              resetEnquiryFormFields();
+              $('#enquiry-form-status').html(`
+        <span class="text-success">Query successfully submitted!</span>
+      `);
+          }
+      }).fail(function (error) {
+          unlockEnquiryFormFields();
+          $('#enquiry-form-status').html(`
+      <span class="text-danger">Couldn't submit your query. Please try again...</span>
+    `);
+      });
+  });
+});
+	
+	</script>
+	</head>
+	
+
+<body>
+    <form method="post" action="" id="enquiry-form" style="text-align: center; justify-content: center; ">
+        <label for="enquiry-name">Name</label>
+        <input type="text" name="name" id="enquiry-name" placeholder="John Doe"/>
+        <label for="enquiry-email">Email <span class="text-danger">*</span></label>
+        <input type="email" required name="email" id="enquiry-email" class="form-control mb-3" placeholder="email@gmail.com"/>
+        <label for="enquiry-phone">Phone</label>
+        <input type="text" name="phone" id="enquiry-phone" class="form-control mb-3" placeholder="+91 9876543210" />
+        <label for="enquiry-message">Message <span class="text-danger">*</span></label>
+        <textarea name="message" required id="enquiry-message" class="form-control mb-3" placeholder="Tell us your queries."></textarea>
+        <!-- <div class="text-muted pb-2">
+            <span class="text-danger">*</span> marked inputs are mandatory.
+        </div> -->
+        <!-- <div class="my-2" id="enquiry-form-status"></div> -->
+        <input type="submit" id="enquiry-submit" class="gform_button button" value="Submit" style="text-align: center!important;" />
+    </form>
+</body>
+
+</html>
